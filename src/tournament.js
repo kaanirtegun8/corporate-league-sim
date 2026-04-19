@@ -1,7 +1,7 @@
 import { reactive, ref, computed } from 'vue'
 
 export const GROUPS = {
-  A: ['Turkcell', 'Happy Moons', 'Fellas', 'Elzemtat'],
+  A: ['Turkcell', 'Happy Moons', 'Fellas', 'ATR YAPI'],
   B: ['Siemens', 'Otokoç', 'Dinçer Lojistik', 'Aslı Partners'],
   C: ['Garanti BBVA', 'Socar Türkiye', 'Scorp', 'Odeabank'],
   D: ['Smart Mind', 'TEB', 'Shell', 'Kalitegaz'],
@@ -111,6 +111,15 @@ export function useTournament() {
       )
       builderOrder[g] = [...GROUPS[g]]
     })
+    // 1. Hafta sonuçları (18 Nisan 2026)
+    groupMatches.A[0][0].hs = 4; groupMatches.A[0][0].as = 0 // Turkcell 4-0 ATR YAPI
+    groupMatches.A[0][1].hs = 5; groupMatches.A[0][1].as = 1 // Happy Moons 5-1 Fellas
+    groupMatches.B[0][0].hs = 19; groupMatches.B[0][0].as = 1 // Siemens 19-1 Aslı Partners
+    groupMatches.B[0][1].hs = 2; groupMatches.B[0][1].as = 3 // Otokoç 2-3 Dinçer Lojistik
+    groupMatches.C[0][0].hs = 4; groupMatches.C[0][0].as = 0 // Garanti BBVA 4-0 Odeabank
+    groupMatches.C[0][1].hs = 0; groupMatches.C[0][1].as = 4 // Socar Türkiye 0-4 Scorp
+    groupMatches.D[0][0].hs = 6; groupMatches.D[0][0].as = 0 // Smart Mind 6-0 Kalitegaz
+    groupMatches.D[0][1].hs = 4; groupMatches.D[0][1].as = 1 // TEB 4-1 Shell
     ALL_KO_IDS.forEach((id) => {
       koMatches[id] = {
         homeTeam: null,
@@ -189,7 +198,16 @@ export function useTournament() {
       })
     })
     s.forEach((x) => (x.gd = x.gf - x.ga))
-    s.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
+    s.sort((a, b) => {
+      const diff = b.pts - a.pts || b.gd - a.gd || b.gf - a.gf
+      if (diff !== 0) return diff
+      // Grup C özel tiebreaker: eşitlikte Scorp öncelikli
+      if (g === 'C') {
+        if (a.name === 'Scorp') return -1
+        if (b.name === 'Scorp') return 1
+      }
+      return 0
+    })
     return s
   }
 
