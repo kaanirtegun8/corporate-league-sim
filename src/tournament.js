@@ -118,7 +118,7 @@ export function useTournament() {
     groupMatches.B[0][1].hs = 2; groupMatches.B[0][1].as = 3 // Otokoç 2-3 Dinçer Lojistik
     groupMatches.C[0][0].hs = 4; groupMatches.C[0][0].as = 0 // Garanti BBVA 4-0 Odeabank
     groupMatches.C[0][1].hs = 0; groupMatches.C[0][1].as = 4 // Socar Türkiye 0-4 Scorp
-    groupMatches.D[0][0].hs = 6; groupMatches.D[0][0].as = 0 // Smart Mind 6-0 Kalitegaz
+    groupMatches.D[0][0].hs = 19; groupMatches.D[0][0].as = 1 // Smart Mind 19-1 Kalitegaz
     groupMatches.D[0][1].hs = 4; groupMatches.D[0][1].as = 1 // TEB 4-1 Shell
     ALL_KO_IDS.forEach((id) => {
       koMatches[id] = {
