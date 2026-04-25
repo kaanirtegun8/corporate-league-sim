@@ -120,6 +120,14 @@ export function useTournament() {
     groupMatches.C[0][1].hs = 0; groupMatches.C[0][1].as = 4 // Socar Türkiye 0-4 Scorp
     groupMatches.D[0][0].hs = 19; groupMatches.D[0][0].as = 1 // Smart Mind 19-1 Kalitegaz
     groupMatches.D[0][1].hs = 4; groupMatches.D[0][1].as = 1 // TEB 4-1 Shell
+    // 2. Hafta sonuçları (25 Nisan 2026)
+    groupMatches.A[1][0].hs = 8; groupMatches.A[1][0].as = 0 // Turkcell 8-0 Fellas
+    groupMatches.B[1][0].hs = 6; groupMatches.B[1][0].as = 1 // Siemens 6-1 Dinçer Lojistik
+    groupMatches.B[1][1].hs = 11; groupMatches.B[1][1].as = 0 // Otokoç 11-0 Aslı Partners
+    groupMatches.C[1][0].hs = 5; groupMatches.C[1][0].as = 0 // Garanti BBVA 5-0 Scorp
+    groupMatches.C[1][1].hs = 2; groupMatches.C[1][1].as = 2 // Socar Türkiye 2-2 Odeabank
+    groupMatches.D[1][0].hs = 2; groupMatches.D[1][0].as = 3 // Smart Mind 2-3 Shell
+    groupMatches.D[1][1].hs = 7; groupMatches.D[1][1].as = 0 // TEB 7-0 Kalitegaz
     ALL_KO_IDS.forEach((id) => {
       koMatches[id] = {
         homeTeam: null,
@@ -198,17 +206,60 @@ export function useTournament() {
       })
     })
     s.forEach((x) => (x.gd = x.gf - x.ga))
-    s.sort((a, b) => {
-      const diff = b.pts - a.pts || b.gd - a.gd || b.gf - a.gf
-      if (diff !== 0) return diff
-      // Grup C özel tiebreaker: eşitlikte Scorp öncelikli
-      if (g === 'C') {
-        if (a.name === 'Scorp') return -1
-        if (b.name === 'Scorp') return 1
-      }
-      return 0
+
+    // Önce puana göre sırala
+    s.sort((a, b) => b.pts - a.pts)
+
+    // Eşit puanlı bloklar için mini-lig (kendi aralarındaki maçlar) tiebreaker'ı
+    const result = []
+    let i = 0
+    while (i < s.length) {
+      let j = i
+      while (j < s.length && s[j].pts === s[i].pts) j++
+      const block = s.slice(i, j)
+      if (block.length > 1) sortMiniLeague(g, block)
+      result.push(...block)
+      i = j
+    }
+    return result
+  }
+
+  function sortMiniLeague(g, tied) {
+    const tiedIdxs = new Set(tied.map((t) => t.idx))
+    const mini = {}
+    tied.forEach((t) => {
+      mini[t.idx] = { pts: 0, gf: 0, ga: 0, gd: 0 }
     })
-    return s
+    groupMatches[g].forEach((week) => {
+      week.forEach((m) => {
+        if (m.hs === null || m.as === null) return
+        if (!tiedIdxs.has(m.home) || !tiedIdxs.has(m.away)) return
+        const h = mini[m.home]
+        const a = mini[m.away]
+        h.gf += m.hs
+        h.ga += m.as
+        a.gf += m.as
+        a.ga += m.hs
+        if (m.hs > m.as) h.pts += 3
+        else if (m.hs < m.as) a.pts += 3
+        else {
+          h.pts++
+          a.pts++
+        }
+      })
+    })
+    Object.values(mini).forEach((x) => (x.gd = x.gf - x.ga))
+    tied.sort((a, b) => {
+      const ma = mini[a.idx]
+      const mb = mini[b.idx]
+      return (
+        mb.pts - ma.pts ||
+        mb.gd - ma.gd ||
+        mb.gf - ma.gf ||
+        b.gd - a.gd ||
+        b.gf - a.gf
+      )
+    })
   }
 
   function getTeamByRank(g, rank) {
