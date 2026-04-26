@@ -122,6 +122,7 @@ export function useTournament() {
     groupMatches.D[0][1].hs = 4; groupMatches.D[0][1].as = 1 // TEB 4-1 Shell
     // 2. Hafta sonuçları (25 Nisan 2026)
     groupMatches.A[1][0].hs = 8; groupMatches.A[1][0].as = 0 // Turkcell 8-0 Fellas
+    groupMatches.A[1][1].hs = 8; groupMatches.A[1][1].as = 3 // Happy Moons 8-3 ATR YAPI
     groupMatches.B[1][0].hs = 6; groupMatches.B[1][0].as = 1 // Siemens 6-1 Dinçer Lojistik
     groupMatches.B[1][1].hs = 11; groupMatches.B[1][1].as = 0 // Otokoç 11-0 Aslı Partners
     groupMatches.C[1][0].hs = 5; groupMatches.C[1][0].as = 0 // Garanti BBVA 5-0 Scorp
